@@ -1,7 +1,7 @@
 # 📰 News App (SwiftUI)
 
 A modern iOS News App built using **SwiftUI + MVVM**, supporting search, offline caching, and unit testing.
-
+API Used:- https://newsapi.org 
 ---
 
 ## ✨ Features
