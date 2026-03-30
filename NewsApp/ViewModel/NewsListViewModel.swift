@@ -10,13 +10,12 @@ import Combine
 
 @MainActor
 final class NewsViewModel: ObservableObject {
+    
+    // MARK: - UI State
     @Published var articles: [Article] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var searchText: String = ""
-    
-    var loadLocal: (() -> [Article])?
-    var saveLocal: (([Article]) -> Void)?
     
     private let repository: NewsRepositoryProtocol
     
@@ -27,19 +26,23 @@ final class NewsViewModel: ObservableObject {
     func fetchNews(forceRefresh: Bool = false) async {
         errorMessage = nil
         
-        // Load cached first
-        if !forceRefresh, let local = loadLocal?(), !local.isEmpty {
-            articles = local
-            if !articles.isEmpty { return } // Avoid API if already have data
+        if !forceRefresh {
+            // Load cached first
+            let local = repository.loadArticles()
+            if !local.isEmpty {
+                articles = local
+            } else {
+                isLoading = true
+            }
         } else {
             isLoading = true
         }
         
         do {
-            let freshArticle = try await repository.getNews()
-            if freshArticle != articles {
-                articles = freshArticle
-                saveLocal?(freshArticle)
+            let freshArticles = try await repository.getNews()
+            if freshArticles != articles {
+                articles = freshArticles
+                repository.saveArticles(freshArticles)
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -55,13 +58,5 @@ final class NewsViewModel: ObservableObject {
         return articles.filter {
             $0.title.lowercased().contains(lower)
         }
-    }
-    
-    func setupPersistence(
-        load: @escaping () -> [Article],
-        save: @escaping ([Article]) -> Void
-    ) {
-        self.loadLocal = load
-        self.saveLocal = save
     }
 }

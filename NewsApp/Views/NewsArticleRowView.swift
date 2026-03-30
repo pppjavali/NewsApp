@@ -12,12 +12,11 @@ struct NewsArticleRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: NewsConstants.Spacing.spacing8) {
-            
-            articleImage
-                .frame(width: NewsConstants.Spacing.width,
-                       height: NewsConstants.Spacing.height)
-                .clipped()
-                .cornerRadius(NewsConstants.Spacing.spacing8)
+            ArticleImageView(
+                urlString: article.urlToImage,
+                height: NewsConstants.Spacing.height,
+                width: NewsConstants.Spacing.width
+            )
             textContent
         }
     }
@@ -40,37 +39,6 @@ private extension NewsArticleRowView {
             }
         }
         .padding(.vertical, NewsConstants.Spacing.spacing6)
-    }
-    
-    @ViewBuilder
-    var articleImage: some View {
-        if let imageURL = article.urlToImage,
-           let url = URL(string: imageURL) {
-            
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
-                    image.resizable().scaledToFill()
-                default:
-                    placeholderImage
-                }
-            }
-            
-        } else {
-            placeholderImage
-        }
-    }
-    @ViewBuilder
-    var placeholderImage: some View {
-        ZStack {
-            Color.gray.opacity(0.2)
-            Image(systemName: NewsConstants.Image.photo)
-                .foregroundColor(.gray)
-        }
-        .frame(width: NewsConstants.Spacing.width,
-               height: NewsConstants.Spacing.height)
-        .cornerRadius(NewsConstants.Spacing.spacing8)
-        
     }
 }
 #Preview {

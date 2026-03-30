@@ -11,9 +11,6 @@ import SwiftData
 
 struct NewsView: View {
     @ObservedObject var viewModel: NewsViewModel
-    @Environment(\.modelContext) private var context
-    @Query private var savedArticles: [ArticleEntity]
-    
     @State private var didSetup = false
     
     var body: some View {
@@ -34,47 +31,12 @@ private extension NewsView {
     func setup() {
         guard !didSetup else { return }
         didSetup = true
-        viewModel.setupPersistence(
-            load: { loadFromLocal() },
-            save: { saveArticles($0) }
-        )
-        
         Task {
             await viewModel.fetchNews()
         }
     }
 }
 
-// MARK: - Database Related
-private extension NewsView {
-    func saveArticles(_ articles: [Article]) {
-        // Clear old data
-        savedArticles.forEach { context.delete($0) }
-        
-        for item in articles {
-            let entity = ArticleEntity(
-                title: item.title,
-                description: item.description,
-                url: item.url,
-                urlToImage: item.urlToImage,
-                publishedAt: item.publishedAt
-            )
-            context.insert(entity)
-        }
-    }
-    
-    func loadFromLocal() -> [Article] {
-        return savedArticles.map {
-            Article(
-                title: $0.title,
-                description: $0.desc,
-                url: $0.url,
-                urlToImage: $0.urlToImage,
-                publishedAt: $0.publishedAt
-            )
-        }
-    }
-}
 
 // MARK: - Private Views
 private extension NewsView {
@@ -142,8 +104,4 @@ private extension NewsView {
             }
         }
     }
-}
-
-#Preview {
-    NewsView(viewModel: NewsViewModel(repository: NewsRepository(apiService: APIService())))
 }

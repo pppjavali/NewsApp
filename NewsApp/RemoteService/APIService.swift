@@ -7,25 +7,13 @@
 
 import Foundation
 
-final class NewsRepository: NewsRepositoryProtocol {
-    private let apiService: APIServiceProtocol
-    
-    init(apiService: APIServiceProtocol = APIService()) {
-        self.apiService = apiService
-    }
-    
-    func getNews() async throws -> [Article] {
-        return try await apiService.fetchNews()
-    }
-}
-
 final class URLSessionClient: NetworkClient {
     func data(from url: URL) async throws -> (Data, URLResponse) {
         try await URLSession.shared.data(from: url)
     }
 }
 
-final class APIService: APIServiceProtocol {
+class APIService: APIServiceProtocol {
     
     private let client: NetworkClient
     

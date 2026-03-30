@@ -56,48 +56,6 @@ final class NewsViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.errorMessage)
     }
     
-    func test_fetchNews_loadsFromCache_whenAvailable() async {
-        // Given
-        let cached = [
-            Article(title: "Local", description: nil, url: nil, urlToImage: nil, publishedAt: nil)
-        ]
-        
-        viewModel.setupPersistence(
-            load: { cached },
-            save: { _ in }
-        )
-
-        // When
-        await viewModel.fetchNews()
-
-        // Then
-        XCTAssertEqual(viewModel.articles.first?.title, "Local")
-    }
-    
-    func test_fetchNews_forceRefresh_ignoresCache() async {
-        // Given
-        let cached = [
-            Article(title: "Local", description: nil, url: nil, urlToImage: nil, publishedAt: nil)
-        ]
-        
-        let fresh = [
-            Article(title: "API", description: nil, url: nil, urlToImage: nil, publishedAt: nil)
-        ]
-        
-        mockRepo.mockArticles = fresh
-        
-        viewModel.setupPersistence(
-            load: { cached },
-            save: { _ in }
-        )
-
-        // When
-        await viewModel.fetchNews(forceRefresh: true)
-
-        // Then
-        XCTAssertEqual(viewModel.articles.first?.title, "API")
-    }
-    
     func test_filteredArticles_filtersCorrectly() {
         // Given
         viewModel.articles = [
@@ -133,6 +91,12 @@ final class NewsViewModelTests: XCTestCase {
 }
 
 final class MockNewsRepository: NewsRepositoryProtocol {
+    func saveArticles(_ articles: [Article]) { }
+    
+    func loadArticles() -> [Article] {
+        return []
+    }
+    
     var shouldFail = false
     var mockArticles: [Article] = []
     

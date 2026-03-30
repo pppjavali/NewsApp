@@ -10,11 +10,33 @@ import SwiftData
 
 @main
 struct NewsAppApp: App {
+    
+    // Create container
+    private let container: ModelContainer
+    
+    init() {
+        do {
+            container = try ModelContainer(for: ArticleEntity.self)
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
-            NewsView(viewModel:
-                        NewsViewModel(repository: NewsRepository(apiService: APIService())))
-                .modelContainer(for: ArticleEntity.self)
+            
+            // Inject context into repository
+            let context = container.mainContext
+            
+            let repository = NewsRepository(
+                apiService: APIService(),
+                context: context
+            )
+            
+            let viewModel = NewsViewModel(repository: repository)
+            
+            NewsView(viewModel: viewModel)
         }
+        .modelContainer(container)
     }
 }

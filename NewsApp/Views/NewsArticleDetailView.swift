@@ -13,7 +13,11 @@ struct NewsArticleDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: NewsConstants.Spacing.spacing12) {
-                articleImage
+                ArticleImageView(urlString: article.urlToImage,
+                                 height: nil,
+                                 width: nil)
+                .scaledToFit()
+                .frame(maxWidth: .infinity, minHeight: NewsConstants.Spacing.height)
                 titleView
                 descriptionView
                 dateView
@@ -44,7 +48,7 @@ private extension NewsArticleDetailView {
     }
     
     var dateView: some View {
-        Text(formattedDate)
+        Text(article.publishedAt?.toFormattedDate() ?? "")
             .font(.footnote)
             .foregroundStyle(.secondary)
     }
@@ -63,67 +67,6 @@ private extension NewsArticleDetailView {
             Link(NewsConstants.readFullArticle, destination: url)
                 .font(.headline)
         }
-    }
-    
-    @ViewBuilder
-    var articleImage: some View {
-        if let imageURL = article.urlToImage,
-           let url = URL(string: imageURL) {
-            
-            AsyncImage(url: url) { phase in
-                switch phase {
-                    
-                case .empty:
-                    placeholderImage
-                    
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, minHeight: NewsConstants.Spacing.height)
-                        .clipped()
-                        .cornerRadius(NewsConstants.Spacing.spacing8)
-                    
-                case .failure:
-                    placeholderImage
-                    
-                @unknown default:
-                    placeholderImage
-                }
-            }
-            
-        } else {
-            placeholderImage
-        }
-    }
-    
-    var placeholderImage: some View {
-        ZStack {
-            Color.gray.opacity(0.2)
-            Image(systemName: NewsConstants.Image.photo)
-                .foregroundColor(.gray)
-        }
-        .frame(maxWidth: .infinity,
-               minHeight: NewsConstants.Spacing.height)
-        .cornerRadius(NewsConstants.Spacing.spacing8)
-    }
-}
-
-// MARK: - Private helper
-private extension NewsArticleDetailView {
-    var formattedDate: String {
-        guard let publishedAt = article.publishedAt else { return "" }
-        
-        let isoFormatter = ISO8601DateFormatter()
-        
-        if let date = isoFormatter.date(from: publishedAt) {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            formatter.timeStyle = .short
-            return formatter.string(from: date)
-        }
-        
-        return publishedAt
     }
 }
 

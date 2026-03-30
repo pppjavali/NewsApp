@@ -13,6 +13,8 @@ protocol APIServiceProtocol {
 
 protocol NewsRepositoryProtocol {
     func getNews() async throws -> [Article]
+    func saveArticles(_ articles: [Article])
+    func loadArticles() -> [Article]
 }
 
 protocol NetworkClient {
