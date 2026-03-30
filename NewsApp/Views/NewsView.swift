@@ -105,3 +105,41 @@ private extension NewsView {
         }
     }
 }
+final class PreviewNewsRepository: NewsRepositoryProtocol {
+    func getNews() async throws -> [Article] {
+        return [
+            Article(
+                title: "Preview Title",
+                description: "Preview Description",
+                url: "https://test.com",
+                urlToImage: nil,
+                publishedAt: "2024-03-29T12:00:00Z"
+            )
+        ]
+    }
+
+    func saveArticles(_ articles: [Article]) { }
+
+    func loadArticles() -> [Article] {
+        return []
+    }
+}
+
+struct NewsView_Previews: PreviewProvider {
+    @MainActor
+    static var previews: some View {
+        let vm = NewsViewModel(repository: PreviewNewsRepository())
+        vm.articles = [
+            Article(
+                title: "Preview Title",
+                description: "Preview Description",
+                url: "https://test.com",
+                urlToImage: nil,
+                publishedAt: "2024-03-29T12:00:00Z"
+            )
+        ]
+
+        return NewsView(viewModel: vm)
+    }
+}
+
