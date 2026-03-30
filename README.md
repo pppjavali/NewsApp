@@ -12,7 +12,6 @@ A modern iOS News App built using **SwiftUI + MVVM**, supporting search, offline
 - 💾 Offline mode (SwiftData caching)
 - 🖼 Async image loading with placeholder
 - ⚡ Smooth list performance
-- ♿ Accessibility (VoiceOver support)
 - 🧪 Unit testing (ViewModel + API)
 
 ---
